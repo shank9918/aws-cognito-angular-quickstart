@@ -1,8 +1,12 @@
-import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
-import { UserLoginService } from "../../../service/user-login.service";
-import { ChallengeParameters, CognitoCallback, LoggedInCallback } from "../../../service/cognito.service";
-import { DynamoDBService } from "../../../service/ddb.service";
+import {Component, OnInit} from "@angular/core";
+import {Router} from "@angular/router";
+import {UserLoginService} from "../../../service/user-login.service";
+import {ChallengeParameters, CognitoCallback, LoggedInCallback} from "../../../service/cognito.service";
+import {DynamoDBService} from "../../../service/ddb.service";
+import * as AWS from "aws-sdk";
+import {environment} from "../../../../environments/environment";
+
+declare var FB: any;
 
 @Component({
     selector: 'awscognito-angular2-app',
@@ -22,6 +26,12 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
                 public ddb: DynamoDBService,
                 public userService: UserLoginService) {
         console.log("LoginComponent constructor");
+        FB.init({
+            appId: '831160593749122',
+            cookie: true,
+            xfbml: true,
+            version: 'v3.0'
+        });
     }
 
     ngOnInit() {
@@ -78,5 +88,25 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
     cancelMFA(): boolean {
         this.mfaStep = false;
         return false;   //necessary to prevent href navigation
+    }
+
+    facebookLogin() {
+        FB.login(function (response) {
+            // Check if the user logged in successfully.
+            if (response.authResponse) {
+                console.log('You are now logged in.');
+                // Add the Facebook access token to the Cognito credentials login map.
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: environment.identityPoolId,
+                    Logins: {
+                        'graph.facebook.com': response.authResponse.accessToken
+                    }
+                });
+
+            } else {
+                console.log('There was a problem logging you in.');
+            }
+
+        });
     }
 }
