@@ -1,0 +1,11 @@
+{
+    "UserPoolClient": {
+        "UserPoolId": "ap-south-1_y6AS1g7AS",
+        "ClientName": "webapp",
+        "ClientId": "483q7d79ei19i165o2fm0kumi2",
+        "LastModifiedDate": 1527340604.287,
+        "CreationDate": 1527340604.287,
+        "RefreshTokenValidity": 30,
+        "AllowedOAuthFlowsUserPoolClient": false
+    }
+}

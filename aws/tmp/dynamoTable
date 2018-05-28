@@ -1,0 +1,36 @@
+{
+    "Table": {
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "activityDate",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "userId",
+                "AttributeType": "S"
+            }
+        ],
+        "TableName": "bmc_logintrials",
+        "KeySchema": [
+            {
+                "AttributeName": "userId",
+                "KeyType": "HASH"
+            },
+            {
+                "AttributeName": "activityDate",
+                "KeyType": "RANGE"
+            }
+        ],
+        "TableStatus": "ACTIVE",
+        "CreationDateTime": 1527232210.959,
+        "ProvisionedThroughput": {
+            "NumberOfDecreasesToday": 0,
+            "ReadCapacityUnits": 1,
+            "WriteCapacityUnits": 1
+        },
+        "TableSizeBytes": 0,
+        "ItemCount": 0,
+        "TableArn": "arn:aws:dynamodb:ap-south-1:417956213156:table/bmc_logintrials",
+        "TableId": "8bb3cce4-c07e-42f3-b946-69454c66cfeb"
+    }
+}

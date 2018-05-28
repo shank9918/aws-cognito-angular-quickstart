@@ -1,0 +1,12 @@
+{
+    "IdentityPoolId": "ap-south-1:382e8b81-50c0-4651-8a00-909e8c4c708e",
+    "IdentityPoolName": "bookmycook",
+    "AllowUnauthenticatedIdentities": true,
+    "CognitoIdentityProviders": [
+        {
+            "ProviderName": "cognito-idp.ap-south-1.amazonaws.com/ap-south-1_y6AS1g7AS",
+            "ClientId": "483q7d79ei19i165o2fm0kumi2",
+            "ServerSideTokenCheck": false
+        }
+    ]
+}

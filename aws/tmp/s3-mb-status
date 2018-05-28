@@ -1,0 +1,1 @@
+make_bucket failed: s3://bookmycook.platform/ An error occurred (BucketAlreadyOwnedByYou) when calling the CreateBucket operation: Your previous request to create the named bucket succeeded and you already own it.
