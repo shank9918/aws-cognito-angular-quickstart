@@ -5,9 +5,6 @@ import {Stuff} from "../secure/useractivity/useractivity.component";
 import * as AWS from "aws-sdk/global";
 import * as DynamoDB from "aws-sdk/clients/dynamodb";
 
-/**
- * Created by Vladimir Budilov
- */
 @Injectable()
 export class DynamoDBService {
 	constructor(public cognitoUtil: CognitoUtil) {
