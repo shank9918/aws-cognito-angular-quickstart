@@ -10,22 +10,139 @@ declare var FB: any;
 
 @Injectable()
 export class UserLoginService {
-
+	private platform: string;
 	private onCognitoLoginSuccess = (callback: CognitoCallback, session: CognitoUserSession) => {
 		console.log("In authenticateUser onSuccess callback");
 		AWS.config.credentials = this.cognitoUtil.buildCognitoCreds(session.getIdToken().getJwtToken());
-		this.invokeCallback(callback, session)
+		this.invokeCallback(callback, session);
 	};
-
 	private onFacebookLoginSuccess = (callback: CognitoCallback, response: any) => {
 		console.log("In authenticateUser onSuccess callback");
 		AWS.config.credentials = this.cognitoUtil.buildFacebookCreds(response);
-		this.invokeCallback(callback, null)
+		this.invokeCallback(callback, null);
 	};
-
 	private onLoginError = (callback: CognitoCallback, err) => {
 		callback.cognitoCallback(err.message, null);
 	};
+
+	constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
+		console.log('Facebook initializing');
+		FB.init(environment.fb_configs);
+		console.log('Facebook initialized');
+	}
+
+	authenticate(username: string, password: string, platform: string, callback: CognitoCallback) {
+		console.log("UserLoginService: starting the authentication");
+		this.platform = platform;
+		let authenticationData = {
+			Username: username,
+			Password: password,
+		};
+		let authenticationDetails = new AuthenticationDetails(authenticationData);
+		let userData = {
+			Username: username,
+			Pool: this.cognitoUtil.getUserPool()
+		};
+		if (this.platform == 'cognito') {
+			console.log("UserLoginService: Params set...Authenticating the user");
+			let cognitoUser = new CognitoUser(userData);
+			console.log("UserLoginService: config is " + AWS.config);
+			cognitoUser.authenticateUser(authenticationDetails, {
+				newPasswordRequired: (userAttributes, requiredAttributes) => callback.cognitoCallback(`User needs to set password.`, null),
+				onSuccess: result => this.onCognitoLoginSuccess(callback, result),
+				onFailure: err => this.onLoginError(callback, err),
+				mfaRequired: (challengeName, challengeParameters) => {
+					callback.handleMFAStep(challengeName, challengeParameters, (confirmationCode: string) => {
+						cognitoUser.sendMFACode(confirmationCode, {
+							onSuccess: result => this.onCognitoLoginSuccess(callback, result),
+							onFailure: err => this.onLoginError(callback, err)
+						});
+					});
+				}
+			});
+		} else if (this.platform == 'facebook') {
+			FB.login(response => this.onFacebookLoginSuccess(callback, response));
+		}
+	}
+
+	forgotPassword(username: string, callback: CognitoCallback) {
+		let userData = {
+			Username: username,
+			Pool: this.cognitoUtil.getUserPool()
+		};
+		let cognitoUser = new CognitoUser(userData);
+		cognitoUser.forgotPassword({
+			onSuccess: function () {
+			},
+			onFailure: function (err) {
+				callback.cognitoCallback(err.message, null);
+			},
+			inputVerificationCode() {
+				callback.cognitoCallback(null, null);
+			}
+		});
+	}
+
+	confirmNewPassword(email: string, verificationCode: string, password: string, callback: CognitoCallback) {
+		let userData = {
+			Username: email,
+			Pool: this.cognitoUtil.getUserPool()
+		};
+		let cognitoUser = new CognitoUser(userData);
+		cognitoUser.confirmPassword(verificationCode, password, {
+			onSuccess: function () {
+				callback.cognitoCallback(null, null);
+			},
+			onFailure: function (err) {
+				callback.cognitoCallback(err.message, null);
+			}
+		});
+	}
+
+	logout() {
+		console.log("UserLoginService: Logging out");
+		this.ddb.writeLogEntry("logout");
+		if (this.platform == 'cognito') {
+			this.cognitoUtil.getCurrentUser().signOut();
+		} else if (this.platform == 'facebook') {
+			FB.logout((response) => {
+				console.log('logged out from facebook...');
+			});
+		}
+	}
+
+	isAuthenticated(callback: LoggedInCallback) {
+		if (callback == null)
+			throw("UserLoginService: Callback in isAuthenticated() cannot be null");
+		if (this.platform == 'cognito') {
+			let cognitoUser = this.cognitoUtil.getCurrentUser();
+			if (cognitoUser != null) {
+				cognitoUser.getSession(function (err, session) {
+					if (err) {
+						console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
+						callback.isLoggedIn(err, false);
+					}
+					else {
+						console.log("UserLoginService: Session is " + session.isValid());
+						callback.isLoggedIn(err, session.isValid());
+					}
+				});
+			} else {
+				console.log("UserLoginService: can't retrieve the current user");
+				callback.isLoggedIn("Can't retrieve the CurrentUser", false);
+			}
+		} else if (this.platform == 'facebook') {
+			FB.getLoginStatus(function (response) {
+				if (response.status == 'connected') {
+					callback.isLoggedIn(null, true);
+				} else if (response.status == 'not_authorized ') {
+					// TODO call onFacebookLoginSuccess and try to authorize the user
+				} else {
+					callback.isLoggedIn('Unknown status received from facebook', false);
+				}
+			});
+		}
+	}
 
 	private invokeCallback(callback: CognitoCallback, session: CognitoUserSession) {
 
@@ -45,116 +162,5 @@ export class UserLoginService {
 			console.log("UserLoginService: Successfully set the AWS credentials");
 			callback.cognitoCallback(null, session);
 		});
-	}
-
-	constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
-		console.log('Facebook initializing')
-		FB.init(environment.fb_configs);
-		console.log('Facebook initialized')
-	}
-
-	authenticate(username: string, password: string, platform: string, callback: CognitoCallback) {
-		console.log("UserLoginService: starting the authentication");
-
-		let authenticationData = {
-			Username: username,
-			Password: password,
-		};
-		let authenticationDetails = new AuthenticationDetails(authenticationData);
-
-		let userData = {
-			Username: username,
-			Pool: this.cognitoUtil.getUserPool()
-		};
-
-		if (platform == 'cognito') {
-			console.log("UserLoginService: Params set...Authenticating the user");
-			let cognitoUser = new CognitoUser(userData);
-			console.log("UserLoginService: config is " + AWS.config);
-			cognitoUser.authenticateUser(authenticationDetails, {
-				newPasswordRequired: (userAttributes, requiredAttributes) => callback.cognitoCallback(`User needs to set password.`, null),
-				onSuccess: result => this.onCognitoLoginSuccess(callback, result),
-				onFailure: err => this.onLoginError(callback, err),
-				mfaRequired: (challengeName, challengeParameters) => {
-					callback.handleMFAStep(challengeName, challengeParameters, (confirmationCode: string) => {
-						cognitoUser.sendMFACode(confirmationCode, {
-							onSuccess: result => this.onCognitoLoginSuccess(callback, result),
-							onFailure: err => this.onLoginError(callback, err)
-						});
-					});
-				}
-			});
-		} else if (platform == 'facebook') {
-			FB.login(response => this.onFacebookLoginSuccess(callback, response));
-		}
-	}
-
-	forgotPassword(username: string, callback: CognitoCallback) {
-		let userData = {
-			Username: username,
-			Pool: this.cognitoUtil.getUserPool()
-		};
-
-		let cognitoUser = new CognitoUser(userData);
-
-		cognitoUser.forgotPassword({
-			onSuccess: function () {
-
-			},
-			onFailure: function (err) {
-				callback.cognitoCallback(err.message, null);
-			},
-			inputVerificationCode() {
-				callback.cognitoCallback(null, null);
-			}
-		});
-	}
-
-	confirmNewPassword(email: string, verificationCode: string, password: string, callback: CognitoCallback) {
-		let userData = {
-			Username: email,
-			Pool: this.cognitoUtil.getUserPool()
-		};
-
-		let cognitoUser = new CognitoUser(userData);
-
-		cognitoUser.confirmPassword(verificationCode, password, {
-			onSuccess: function () {
-				callback.cognitoCallback(null, null);
-			},
-			onFailure: function (err) {
-				callback.cognitoCallback(err.message, null);
-			}
-		});
-	}
-
-	logout() {
-		console.log("UserLoginService: Logging out");
-		this.ddb.writeLogEntry("logout");
-		this.cognitoUtil.getCurrentUser().signOut();
-
-	}
-
-	isAuthenticated(callback: LoggedInCallback) {
-		if (callback == null)
-			throw("UserLoginService: Callback in isAuthenticated() cannot be null");
-
-		let cognitoUser = this.cognitoUtil.getCurrentUser();
-
-		if (cognitoUser != null) {
-			cognitoUser.getSession(function (err, session) {
-				if (err) {
-					console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
-					callback.isLoggedIn(err, false);
-				}
-				else {
-					console.log("UserLoginService: Session is " + session.isValid());
-					callback.isLoggedIn(err, session.isValid());
-				}
-			});
-		} else {
-			console.log("UserLoginService: can't retrieve the current user");
-			callback.isLoggedIn("Can't retrieve the CurrentUser", false);
-		}
 	}
 }

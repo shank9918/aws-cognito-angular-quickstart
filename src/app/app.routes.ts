@@ -13,61 +13,54 @@ import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
 import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.component";
 
 const homeRoutes: Routes = [
-    {
-        path: '',
-        redirectTo: '/home',
-        pathMatch: 'full'
-    },
-    {
-        path: 'home',
-        component: HomeComponent,
-        children: [
-            {path: 'about', component: AboutComponent},
-            {path: 'login', component: LoginComponent},
-            {path: 'register', component: RegisterComponent},
-            {path: 'confirmRegistration/:username', component: RegistrationConfirmationComponent},
-            {path: 'resendCode', component: ResendCodeComponent},
-            {path: 'forgotPassword/:email', component: ForgotPassword2Component},
-            {path: 'forgotPassword', component: ForgotPasswordStep1Component},
-            {path: 'newPassword', component: NewPasswordComponent},
-            {path: '', component: HomeLandingComponent}
-        ]
-    },
+	{
+		path: '',
+		redirectTo: '/home',
+		pathMatch: 'full'
+	},
+	{
+		path: 'home',
+		component: HomeComponent,
+		children: [
+			{path: 'about', component: AboutComponent},
+			{path: 'login', component: LoginComponent},
+			{path: 'register', component: RegisterComponent},
+			{path: 'confirmRegistration/:username', component: RegistrationConfirmationComponent},
+			{path: 'resendCode', component: ResendCodeComponent},
+			{path: 'forgotPassword/:email', component: ForgotPassword2Component},
+			{path: 'forgotPassword', component: ForgotPasswordStep1Component},
+			{path: 'newPassword', component: NewPasswordComponent},
+			{path: '', component: HomeLandingComponent}
+		]
+	},
 ];
-
 const secureHomeRoutes: Routes = [
-    {
-
-        path: '',
-        redirectTo: '/securehome',
-        pathMatch: 'full'
-    },
-    {
-        path: 'securehome', component: SecureHomeComponent, children: [
-        {path: 'logout', component: LogoutComponent},
-        {path: 'jwttokens', component: JwtComponent},
-        {path: 'myprofile', component: MyProfileComponent},
-        {path: 'useractivity', component: UseractivityComponent},
-        {path: '', component: MyProfileComponent}]
-    }
+	{
+		path: '',
+		redirectTo: '/securehome',
+		pathMatch: 'full'
+	},
+	{
+		path: 'securehome', component: SecureHomeComponent, children: [
+			{path: 'logout', component: LogoutComponent},
+			{path: 'jwttokens', component: JwtComponent},
+			{path: 'myprofile', component: MyProfileComponent},
+			{path: 'useractivity', component: UseractivityComponent},
+			{path: '', component: MyProfileComponent}]
+	}
 ];
-
 const routes: Routes = [
-    {
-        path: '',
-        children: [
-            ...homeRoutes,
-            ...secureHomeRoutes,
-            {
-                path: '',
-                component: HomeComponent
-            }
-        ]
-    },
-
-
+	{
+		path: '',
+		children: [
+			...homeRoutes,
+			...secureHomeRoutes,
+			{
+				path: '',
+				component: HomeComponent
+			}
+		]
+	},
 ];
-
 export const appRoutingProviders: any[] = [];
-
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes);

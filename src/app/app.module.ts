@@ -21,43 +21,42 @@ import {ForgotPassword2Component, ForgotPasswordStep1Component} from "./public/a
 import {LogoutComponent, RegistrationConfirmationComponent} from "./public/auth/confirm/confirmRegistration.component";
 import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
 import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.component";
-import { MFAComponent } from './public/auth/mfa/mfa.component';
-
+import {MFAComponent} from './public/auth/mfa/mfa.component';
 
 @NgModule({
-    declarations: [
-        NewPasswordComponent,
-        LoginComponent,
-        LogoutComponent,
-        RegistrationConfirmationComponent,
-        ResendCodeComponent,
-        ForgotPasswordStep1Component,
-        ForgotPassword2Component,
-        RegisterComponent,
-        MFAComponent,
-        AboutComponent,
-        HomeLandingComponent,
-        HomeComponent,
-        UseractivityComponent,
-        MyProfileComponent,
-        SecureHomeComponent,
-        JwtComponent,
-        AppComponent
-    ],
-    imports: [
-        BrowserModule,
-        FormsModule,
-        HttpModule,
-        routing
-    ],
-    providers: [
-        CognitoUtil,
-        AwsUtil,
-        DynamoDBService,
-        UserRegistrationService,
-        UserLoginService,
-        UserParametersService],
-    bootstrap: [AppComponent]
+	declarations: [
+		NewPasswordComponent,
+		LoginComponent,
+		LogoutComponent,
+		RegistrationConfirmationComponent,
+		ResendCodeComponent,
+		ForgotPasswordStep1Component,
+		ForgotPassword2Component,
+		RegisterComponent,
+		MFAComponent,
+		AboutComponent,
+		HomeLandingComponent,
+		HomeComponent,
+		UseractivityComponent,
+		MyProfileComponent,
+		SecureHomeComponent,
+		JwtComponent,
+		AppComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		HttpModule,
+		routing
+	],
+	providers: [
+		CognitoUtil,
+		AwsUtil,
+		DynamoDBService,
+		UserRegistrationService,
+		UserLoginService,
+		UserParametersService],
+	bootstrap: [AppComponent]
 })
 export class AppModule {
 }

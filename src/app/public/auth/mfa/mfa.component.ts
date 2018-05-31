@@ -1,14 +1,14 @@
-import { Component, Input } from "@angular/core";
+import {Component, Input} from "@angular/core";
 
 @Component({
-    selector: 'awscognito-mfa',
-    templateUrl: './mfa.html'
+	selector: 'awscognito-mfa',
+	templateUrl: './mfa.html'
 })
 export class MFAComponent {
-    @Input() destination: string;
-    @Input() onSubmit: (code: string) => void;
+	@Input() destination: string;
+	@Input() onSubmit: (code: string) => void;
 
-    constructor() {
-        console.log("MFAComponent constructor");
-    }
+	constructor() {
+		console.log("MFAComponent constructor");
+	}
 }
