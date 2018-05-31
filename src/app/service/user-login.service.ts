@@ -1,5 +1,5 @@
 import {environment} from "../../environments/environment";
-import {Injectable, OnInit} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {DynamoDBService} from "./ddb.service";
 import {CognitoCallback, CognitoUtil, LoggedInCallback} from "./cognito.service";
 import {AuthenticationDetails, CognitoUser, CognitoUserSession} from "amazon-cognito-identity-js";
@@ -9,11 +9,7 @@ import * as STS from "aws-sdk/clients/sts";
 declare var FB: any;
 
 @Injectable()
-export class UserLoginService implements OnInit {
-
-    ngOnInit(): void {
-        FB.init(environment.fb_configs);
-    }
+export class UserLoginService {
 
     private onLoginSuccess = (callback: CognitoCallback, session: CognitoUserSession) => {
 
@@ -44,6 +40,9 @@ export class UserLoginService implements OnInit {
     };
 
     constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
+        console.log('Facebook initializing')
+        FB.init(environment.fb_configs);
+        console.log('Facebook initialized')
     }
 
     authenticate(username: string, password: string, platform: string, callback: CognitoCallback) {
@@ -87,6 +86,15 @@ export class UserLoginService implements OnInit {
                         IdentityPoolId: environment.identityPoolId,
                         Logins: {
                             'graph.facebook.com': response.authResponse.accessToken
+                        }
+                    });
+                    //call refresh method in order to authenticate user and get new temp credentials
+                    (<AWS.CognitoIdentityCredentials>AWS.config.credentials).refresh((error) => {
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            this.cognitoUtil.setCognitoCreds(AWS.config.credentials)
+                            callback.cognitoCallback(null, null);
                         }
                     });
 

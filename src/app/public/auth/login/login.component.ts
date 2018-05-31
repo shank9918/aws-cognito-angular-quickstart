@@ -31,12 +31,16 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
     }
 
     onLogin(platform: string) {
-        if (this.email == null || this.password == null) {
-            this.errorMessage = "All fields are required";
-            return;
+        if (platform == 'cognito') {
+            if (this.email == null || this.password == null) {
+                this.errorMessage = "All fields are required";
+                return;
+            }
+            this.errorMessage = null;
+            this.userService.authenticate(this.email, this.password, platform, this);
+        } else if (platform == 'facebook') {
+            this.userService.authenticate(this.email, this.password, platform, this);
         }
-        this.errorMessage = null;
-        this.userService.authenticate(this.email, this.password, platform, this);
     }
 
     cognitoCallback(message: string, result: any) {
