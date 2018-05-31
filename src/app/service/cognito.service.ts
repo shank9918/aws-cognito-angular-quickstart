@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
-import { environment } from "../../environments/environment";
-import { CognitoUserPool } from "amazon-cognito-identity-js";
+import {Injectable} from "@angular/core";
+import {environment} from "../../environments/environment";
+import {CognitoUserPool} from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk/global";
 import * as awsservice from "aws-sdk/lib/service";
 import * as CognitoIdentity from "aws-sdk/clients/cognitoidentity";
@@ -93,6 +93,25 @@ export class CognitoUtil {
         }
         let creds = new AWS.CognitoIdentityCredentials(params, serviceConfigs);
         this.setCognitoCreds(creds);
+        return creds;
+    }
+
+    buildFacebookCreds(response: any) {
+        console.log('You are now logged in.');
+        // Add the Facebook access token to the Cognito credentials login map.
+        let creds = AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: environment.identityPoolId,
+            Logins: {
+                'graph.facebook.com': response.authResponse.accessToken
+            }
+        });
+        //call refresh method in order to authenticate user and get new temp credentials
+        (<AWS.CognitoIdentityCredentials>creds).refresh((error) => {
+            if (error) {
+                console.error(error);
+            }
+        });
+        this.setCognitoCreds(creds)
         return creds;
     }
 

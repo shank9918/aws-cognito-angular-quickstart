@@ -57,6 +57,7 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
         } else { //success
             this.ddb.writeLogEntry("login");
             this.router.navigate(['/securehome']);
+            console.log('Operation completed')
         }
     }
 
