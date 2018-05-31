@@ -1,13 +1,19 @@
-import { environment } from "../../environments/environment";
-import { Injectable } from "@angular/core";
-import { DynamoDBService } from "./ddb.service";
-import { CognitoCallback, CognitoUtil, LoggedInCallback } from "./cognito.service";
-import { AuthenticationDetails, CognitoUser, CognitoUserSession } from "amazon-cognito-identity-js";
+import {environment} from "../../environments/environment";
+import {Injectable, OnInit} from "@angular/core";
+import {DynamoDBService} from "./ddb.service";
+import {CognitoCallback, CognitoUtil, LoggedInCallback} from "./cognito.service";
+import {AuthenticationDetails, CognitoUser, CognitoUserSession} from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk/global";
 import * as STS from "aws-sdk/clients/sts";
 
+declare var FB: any;
+
 @Injectable()
-export class UserLoginService {
+export class UserLoginService implements OnInit {
+
+    ngOnInit(): void {
+        FB.init(environment.fb_configs);
+    }
 
     private onLoginSuccess = (callback: CognitoCallback, session: CognitoUserSession) => {
 
@@ -31,16 +37,16 @@ export class UserLoginService {
             console.log("UserLoginService: Successfully set the AWS credentials");
             callback.cognitoCallback(null, session);
         });
-    }
+    };
 
     private onLoginError = (callback: CognitoCallback, err) => {
         callback.cognitoCallback(err.message, null);
-    }
+    };
 
     constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
     }
 
-    authenticate(username: string, password: string, callback: CognitoCallback) {
+    authenticate(username: string, password: string, platform: string, callback: CognitoCallback) {
         console.log("UserLoginService: starting the authentication");
 
         let authenticationData = {
@@ -54,22 +60,43 @@ export class UserLoginService {
             Pool: this.cognitoUtil.getUserPool()
         };
 
-        console.log("UserLoginService: Params set...Authenticating the user");
-        let cognitoUser = new CognitoUser(userData);
-        console.log("UserLoginService: config is " + AWS.config);
-        cognitoUser.authenticateUser(authenticationDetails, {
-            newPasswordRequired: (userAttributes, requiredAttributes) => callback.cognitoCallback(`User needs to set password.`, null),
-            onSuccess: result => this.onLoginSuccess(callback, result),
-            onFailure: err => this.onLoginError(callback, err),
-            mfaRequired: (challengeName, challengeParameters) => {
-                callback.handleMFAStep(challengeName, challengeParameters, (confirmationCode: string) => {
-                    cognitoUser.sendMFACode(confirmationCode, {
-                        onSuccess: result => this.onLoginSuccess(callback, result),
-                        onFailure: err => this.onLoginError(callback, err)
+        if (platform == 'cognito') {
+            console.log("UserLoginService: Params set...Authenticating the user");
+            let cognitoUser = new CognitoUser(userData);
+            console.log("UserLoginService: config is " + AWS.config);
+            cognitoUser.authenticateUser(authenticationDetails, {
+                newPasswordRequired: (userAttributes, requiredAttributes) => callback.cognitoCallback(`User needs to set password.`, null),
+                onSuccess: result => this.onLoginSuccess(callback, result),
+                onFailure: err => this.onLoginError(callback, err),
+                mfaRequired: (challengeName, challengeParameters) => {
+                    callback.handleMFAStep(challengeName, challengeParameters, (confirmationCode: string) => {
+                        cognitoUser.sendMFACode(confirmationCode, {
+                            onSuccess: result => this.onLoginSuccess(callback, result),
+                            onFailure: err => this.onLoginError(callback, err)
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        } else if (platform == 'facebook') {
+            FB.login(function (response) {
+                // Check if the user logged in successfully.
+                if (response.authResponse) {
+                    console.log('You are now logged in.');
+                    // Add the Facebook access token to the Cognito credentials login map.
+                    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                        IdentityPoolId: environment.identityPoolId,
+                        Logins: {
+                            'graph.facebook.com': response.authResponse.accessToken
+                        }
+                    });
+
+                } else {
+                    console.log('There was a problem logging you in.');
+                }
+
+            });
+        }
+
     }
 
     forgotPassword(username: string, callback: CognitoCallback) {
