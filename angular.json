@@ -21,9 +21,13 @@
               "src/favicon.ico"
             ],
             "styles": [
-              "node_modules/bootstrap-social/bootstrap-social.css"
+              "node_modules/bootstrap-social/bootstrap-social.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css"
             ],
             "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+              "node_modules/jquery/dist/jquery.js"
             ]
           },
           "configurations": {
@@ -92,9 +96,13 @@
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "styles": [
-              "node_modules/bootstrap-social/bootstrap-social.css"
+              "node_modules/bootstrap-social/bootstrap-social.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css"
             ],
             "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+              "node_modules/jquery/dist/jquery.js"
             ],
             "assets": [
               "src/assets",

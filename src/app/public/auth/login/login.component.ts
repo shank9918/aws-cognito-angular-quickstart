@@ -56,7 +56,7 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
 			}
 		} else { //success
 			this.ddb.writeLogEntry("login");
-			this.router.navigate(['/securehome']);
+			this.router.navigate(['/secure-home/place-order']);
 			console.log('Operation completed');
 		}
 	}
@@ -76,7 +76,7 @@ export class LoginComponent implements CognitoCallback, LoggedInCallback, OnInit
 
 	isLoggedIn(message: string, isLoggedIn: boolean) {
 		if (isLoggedIn) {
-			this.router.navigate(['/securehome']);
+			this.router.navigate(['/secure-home/place-order']);
 		}
 	}
 
