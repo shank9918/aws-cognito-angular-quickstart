@@ -12,7 +12,7 @@ import {CognitoUtil, LoggedInCallback} from "./service/cognito.service";
 
 @Component({
 	selector: 'app-root',
-	templateUrl: 'template/app.html'
+	templateUrl: 'app.component.html'
 })
 export class AppComponent implements OnInit, LoggedInCallback {
 	constructor(public awsUtil: AwsUtil, public userService: UserLoginService, public cognito: CognitoUtil) {
