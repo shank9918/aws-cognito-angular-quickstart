@@ -1,7 +1,6 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
-import {HttpModule} from "@angular/http";
 import {AppComponent} from "./app.component";
 import {UserRegistrationService} from "./service/user-registration.service";
 import {UserParametersService} from "./service/user-parameters.service";
@@ -22,6 +21,7 @@ import {LogoutComponent, RegistrationConfirmationComponent} from "./public/auth/
 import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
 import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.component";
 import {MFAComponent} from './public/auth/mfa/mfa.component';
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
 	declarations: [
@@ -46,7 +46,7 @@ import {MFAComponent} from './public/auth/mfa/mfa.component';
 	imports: [
 		BrowserModule,
 		FormsModule,
-		HttpModule,
+		HttpClientModule,
 		routing
 	],
 	providers: [
