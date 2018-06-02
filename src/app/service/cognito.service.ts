@@ -86,7 +86,7 @@ export class CognitoUtil {
 	}
 
 	buildFacebookCreds(response: any) {
-		console.log('You are now logged in.');
+		console.log('CognitoUtil: you are now logged in');
 		// Add the Facebook access token to the Cognito credentials login map.
 		let creds = AWS.config.credentials = new AWS.CognitoIdentityCredentials({
 			IdentityPoolId: environment.identityPoolId,
@@ -115,7 +115,7 @@ export class CognitoUtil {
 		if (this.getCurrentUser() != null) {
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
+					console.log("CognitoUtil: can't set the credentials:" + err);
 					callback.callbackWithParam(null);
 				}
 				else {
@@ -137,14 +137,14 @@ export class CognitoUtil {
 		if (this.getCurrentUser() != null)
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
+					console.log("CognitoUtil: can't set the credentials:" + err);
 					callback.callbackWithParam(null);
 				}
 				else {
 					if (session.isValid()) {
 						callback.callbackWithParam(session.getIdToken().getJwtToken());
 					} else {
-						console.log("CognitoUtil: Got the id token, but the session isn't valid");
+						console.log("CognitoUtil: got the id token, but the session isn't valid");
 					}
 				}
 			});
@@ -159,7 +159,7 @@ export class CognitoUtil {
 		if (this.getCurrentUser() != null)
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
+					console.log("CognitoUtil: can't set the credentials:" + err);
 					callback.callbackWithParam(null);
 				}
 				else {
@@ -175,7 +175,7 @@ export class CognitoUtil {
 	refresh(): void {
 		this.getCurrentUser().getSession(function (err, session) {
 			if (err) {
-				console.log("CognitoUtil: Can't set the credentials:" + err);
+				console.log("CognitoUtil: can't set the credentials:" + err);
 			}
 			else {
 				if (session.isValid()) {

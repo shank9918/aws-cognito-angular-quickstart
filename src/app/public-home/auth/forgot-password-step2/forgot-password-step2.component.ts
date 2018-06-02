@@ -17,7 +17,7 @@ export class ForgotPasswordStep2Component implements CognitoCallback, OnInit, On
 
 	constructor(public router: Router, public route: ActivatedRoute,
 				public userService: UserLoginService) {
-		console.log("email from the url: " + this.email);
+		console.log("ForgotPasswordStep2Component: email from the url: " + this.email);
 	}
 
 	ngOnInit() {
@@ -39,7 +39,6 @@ export class ForgotPasswordStep2Component implements CognitoCallback, OnInit, On
 	cognitoCallback(message: string) {
 		if (message != null) { //error
 			this.errorMessage = message;
-			console.log("result: " + this.errorMessage);
 		} else { //success
 			this.router.navigate(['/home/login']);
 		}

@@ -40,7 +40,7 @@ export class DynamoDBService {
 				console.error("DynamoDBService: Unable to query the table. Error JSON:", JSON.stringify(err, null, 2));
 			} else {
 				// print all the movies
-				console.log("DynamoDBService: Query succeeded.");
+				console.log("DynamoDBService: query succeeded.");
 				data.Items.forEach(function (logitem) {
 					mapArray.push({type: logitem.type, date: logitem.activityDate});
 				});
@@ -51,10 +51,10 @@ export class DynamoDBService {
 	writeLogEntry(type: string) {
 		try {
 			let date = new Date().toString();
-			console.log("DynamoDBService: Writing log entry. Type:" + type + " ID: " + this.cognitoUtil.getCognitoIdentity() + " Date: " + date);
+			console.log("DynamoDBService: writing log entry. Type:" + type + " ID: " + this.cognitoUtil.getCognitoIdentity() + " Date: " + date);
 			this.write(this.cognitoUtil.getCognitoIdentity(), date, type);
 		} catch (exc) {
-			console.log("DynamoDBService: Couldn't write to DDB");
+			console.log("DynamoDBService: couldn't write to DDB");
 		}
 	}
 

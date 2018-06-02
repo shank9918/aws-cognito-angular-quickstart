@@ -28,7 +28,7 @@ const homeRoutes: Routes = [
 			{path: 'forgotPassword/:email', component: ForgotPasswordStep2Component},
 			{path: 'forgotPassword', component: ForgotPasswordStep1Component},
 			{path: 'newPassword', component: NewPasswordComponent},
-			{path: '', component: HomeLandingComponent}
+			{path: '', component: LoginComponent}
 		]
 	}
 ];

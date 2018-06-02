@@ -68,7 +68,6 @@ export class UserRegistrationService {
 	}
 
 	newPassword(newPasswordUser: NewPasswordUser, callback: CognitoCallback): void {
-		console.log(newPasswordUser);
 		// Get these details and call
 		//cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, this);
 		let authenticationData = {
@@ -80,9 +79,8 @@ export class UserRegistrationService {
 			Username: newPasswordUser.username,
 			Pool: this.cognitoUtil.getUserPool()
 		};
-		console.log("UserLoginService: Params set...Authenticating the user");
+		console.log("UserLoginService: params set...authenticating the user");
 		let cognitoUser = new CognitoUser(userData);
-		console.log("UserLoginService: config is " + AWS.config);
 		cognitoUser.authenticateUser(authenticationDetails, {
 			newPasswordRequired: function (userAttributes, requiredAttributes) {
 				// User was signed up by an admin and must provide new

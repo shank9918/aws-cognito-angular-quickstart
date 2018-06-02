@@ -12,7 +12,7 @@ import {RouterModule} from "@angular/router";
 		CommonModule,
 		SecureHomeRoutingModule,
 		FormsModule,
-		RouterModule,
+		RouterModule
 	],
 	declarations: [SecureHomeComponent, PlaceOrderComponent, LogoutComponent]
 })

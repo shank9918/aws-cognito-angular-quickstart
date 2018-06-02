@@ -42,10 +42,8 @@ export class RegistrationComponent implements CognitoCallback {
 	cognitoCallback(message: string, result: any) {
 		if (message != null) { //error
 			this.errorMessage = message;
-			console.log("result: " + this.errorMessage);
 		} else { //success
 			//move to the next step
-			console.log("redirecting");
 			this.router.navigate(['/home/confirmRegistration', result.user.username]);
 		}
 	}

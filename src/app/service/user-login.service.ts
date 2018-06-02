@@ -12,12 +12,12 @@ declare var FB: any;
 export class UserLoginService {
 	private platform: string;
 	private onCognitoLoginSuccess = (callback: CognitoCallback, session: CognitoUserSession) => {
-		console.log("In authenticateUser onSuccess callback");
+		console.log("UserLoginService.onCognitoLoginSuccess: In authenticateUser onSuccess callback");
 		AWS.config.credentials = this.cognitoUtil.buildCognitoCreds(session.getIdToken().getJwtToken());
 		this.invokeCallback(callback, session);
 	};
 	private onFacebookLoginSuccess = (callback: CognitoCallback, response: any) => {
-		console.log("In authenticateUser onSuccess callback");
+		console.log("UserLoginService.onFacebookLoginSuccess: In authenticateUser onSuccess callback");
 		AWS.config.credentials = this.cognitoUtil.buildFacebookCreds(response);
 		this.invokeCallback(callback, null);
 	};
@@ -26,9 +26,7 @@ export class UserLoginService {
 	};
 
 	constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
-		console.log('Facebook initializing');
 		FB.init(environment.fb_configs);
-		console.log('Facebook initialized');
 	}
 
 	authenticate(username: string, password: string, platform: string, callback: CognitoCallback) {
@@ -44,9 +42,8 @@ export class UserLoginService {
 			Pool: this.cognitoUtil.getUserPool()
 		};
 		if (this.platform == 'cognito') {
-			console.log("UserLoginService: Params set...Authenticating the user");
+			console.log("UserLoginService: authenticating the user against cognito");
 			let cognitoUser = new CognitoUser(userData);
-			console.log("UserLoginService: config is " + AWS.config);
 			cognitoUser.authenticateUser(authenticationDetails, {
 				newPasswordRequired: (userAttributes, requiredAttributes) => callback.cognitoCallback(`User needs to set password.`, null),
 				onSuccess: result => this.onCognitoLoginSuccess(callback, result),
@@ -100,48 +97,47 @@ export class UserLoginService {
 	}
 
 	logout() {
-		console.log("UserLoginService: Logging out");
-		this.ddb.writeLogEntry("logout");
-		if (this.platform == 'cognito') {
+		let cognitoUser = this.cognitoUtil.getCurrentUser()
+		if (cognitoUser != null) {
 			this.cognitoUtil.getCurrentUser().signOut();
-		} else if (this.platform == 'facebook') {
-			FB.logout((response) => {
-				console.log('logged out from facebook...');
-			});
+			console.log('UserLoginService: logged out from cognito');
 		}
+		FB.getLoginStatus(function (response) {
+			if (response.status == 'connected' || response.status == 'not_authorized') {
+				FB.logout((response) => {
+					console.log('UserLoginService: logged out from facebook');
+				});
+			}
+		});
+		this.ddb.writeLogEntry("logout");
 	}
 
 	isAuthenticated(callback: LoggedInCallback) {
 		if (callback == null)
 			throw("UserLoginService: Callback in isAuthenticated() cannot be null");
-		if (this.platform == 'cognito') {
-			let cognitoUser = this.cognitoUtil.getCurrentUser();
-			if (cognitoUser != null) {
-				cognitoUser.getSession(function (err, session) {
-					if (err) {
-						console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
-						callback.isLoggedIn(err, false);
-					}
-					else {
-						console.log("UserLoginService: Session is " + session.isValid());
-						callback.isLoggedIn(err, session.isValid());
-					}
-				});
-			} else {
-				console.log("UserLoginService: can't retrieve the current user");
-				callback.isLoggedIn("Can't retrieve the CurrentUser", false);
-			}
-		} else if (this.platform == 'facebook') {
-			FB.getLoginStatus(function (response) {
-				if (response.status == 'connected') {
-					callback.isLoggedIn(null, true);
-				} else if (response.status == 'not_authorized ') {
-					// TODO call onFacebookLoginSuccess and try to authorize the user
-				} else {
-					callback.isLoggedIn('Unknown status received from facebook', false);
+		let cognitoUser = this.cognitoUtil.getCurrentUser();
+		if (cognitoUser != null) {
+			cognitoUser.getSession(function (err, session) {
+				if (err) {
+					console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
+					callback.isLoggedIn(err, false);
+				}
+				else {
+					console.log("UserLoginService: Session is " + session.isValid());
+					callback.isLoggedIn(err, session.isValid());
 				}
 			});
 		}
+		FB.getLoginStatus(function (response) {
+			if (response.status == 'connected') {
+				console.log("UserLoginService: facebook status connected");
+				callback.isLoggedIn(null, true);
+			} else if (response.status == 'not_authorized ') {
+				console.log("UserLoginService: facebook status not_authorized");
+				// TODO call onFacebookLoginSuccess and try to authorize the user
+			}
+		});
+		callback.isLoggedIn('not authenticated', false);
 	}
 
 	private invokeCallback(callback: CognitoCallback, session: CognitoUserSession) {
@@ -159,7 +155,7 @@ export class UserLoginService {
 		}
 		let sts = new STS(clientParams);
 		sts.getCallerIdentity(function (err, data) {
-			console.log("UserLoginService: Successfully set the AWS credentials");
+			console.log("UserLoginService: successfully set the AWS credentials");
 			callback.cognitoCallback(null, session);
 		});
 	}

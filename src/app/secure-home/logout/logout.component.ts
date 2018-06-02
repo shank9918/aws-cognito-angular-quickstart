@@ -11,11 +11,13 @@ import {LoggedInCallback} from "../../service/cognito.service";
 export class LogoutComponent implements LoggedInCallback {
 	constructor(public router: Router,
 				public userService: UserLoginService) {
+		console.log("LogoutComponent constructor");
 		this.userService.isAuthenticated(this);
 	}
 
 	isLoggedIn(message: string, isLoggedIn: boolean) {
 		if (isLoggedIn) {
+			console.log('LogoutComponent: logging out')
 			this.userService.logout();
 			this.router.navigate(['/home']);
 		}

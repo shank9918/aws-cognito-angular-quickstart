@@ -9,7 +9,7 @@ export class S3Service {
 
 	public addPhoto(selectedFile): boolean {
 		if (! selectedFile) {
-			console.log('Please choose a file to upload first.');
+			console.log('S3Service: please choose a file to upload first.');
 			return;
 		}
 		let fileName = selectedFile.name;
@@ -23,10 +23,10 @@ export class S3Service {
 			ACL: 'private'
 		}, function (err, data) {
 			if (err) {
-				console.log('There was an error uploading your photo: ', err);
+				console.log('S3Service: there was an error uploading your photo: ', err);
 				return false;
 			}
-			console.log('Successfully uploaded photo.');
+			console.log('S3Service: successfully uploaded photo.');
 			return true;
 		});
 	}
@@ -37,10 +37,10 @@ export class S3Service {
 		// }
 		this.getS3().deleteObject({Key: photoKey}, function (err, data) {
 			if (err) {
-				console.log('There was an error deleting your photo: ', err.message);
+				console.log('S3Service there was an error deleting your photo: ', err.message);
 				return;
 			}
-			console.log('Successfully deleted photo.');
+			console.log('S3Service successfully deleted photo.');
 		});
 	}
 
@@ -48,7 +48,7 @@ export class S3Service {
 		var albumPhotosKey = encodeURIComponent(environment.albumName) + '//';
 		this.getS3().listObjects({Prefix: albumPhotosKey}, function (err, data) {
 			if (err) {
-				console.log('There was an error viewing your album: ' + err);
+				console.log('S3Service: there was an error viewing your album: ' + err);
 			}
 		});
 	}
