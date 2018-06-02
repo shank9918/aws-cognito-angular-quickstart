@@ -6,7 +6,6 @@ import {ResendCodeComponent} from "./auth/resend-code/resend-code.component";
 import {ForgotPasswordStep2Component} from "./auth/forgot-password-step2/forgot-password-step2.component";
 import {ForgotPasswordStep1Component} from "./auth/forgot-password-step1/forgot-password-step1.component";
 import {NewPasswordComponent} from "./auth/new-password/new-password.component";
-import {HomeLandingComponent} from "./home-landing/home-landing.component";
 import {AboutComponent} from "./about/about.component";
 import {RegistrationComponent} from "./auth/registration/registration.component";
 import {ConfirmRegistrationComponent} from "./auth/confirm-registration/confirm-registration.component";

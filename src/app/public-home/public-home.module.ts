@@ -11,7 +11,6 @@ import {ResendCodeComponent} from './auth/resend-code/resend-code.component';
 import {ForgotPasswordStep1Component} from './auth/forgot-password-step1/forgot-password-step1.component';
 import {ForgotPasswordStep2Component} from './auth/forgot-password-step2/forgot-password-step2.component';
 import {AboutComponent} from './about/about.component';
-import {HomeLandingComponent} from './home-landing/home-landing.component';
 import {FormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
 
@@ -34,8 +33,7 @@ import {RouterModule} from "@angular/router";
 		ResendCodeComponent,
 		ForgotPasswordStep1Component,
 		ForgotPasswordStep2Component,
-		AboutComponent,
-		HomeLandingComponent
+		AboutComponent
 	],
 	exports: [
 		LoginComponent
