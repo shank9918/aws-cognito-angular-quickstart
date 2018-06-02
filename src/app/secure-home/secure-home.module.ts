@@ -6,13 +6,15 @@ import {PlaceOrderComponent} from './orders/place-order/place-order.component';
 import {LogoutComponent} from './logout/logout.component';
 import {FormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
+import {PublicHomeModule} from "../public-home/public-home.module";
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SecureHomeRoutingModule,
 		FormsModule,
-		RouterModule
+		RouterModule,
+		PublicHomeModule
 	],
 	declarations: [SecureHomeComponent, PlaceOrderComponent, LogoutComponent]
 })

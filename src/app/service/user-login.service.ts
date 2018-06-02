@@ -1,7 +1,7 @@
 import {environment} from "../../environments/environment";
 import {Injectable} from "@angular/core";
 import {DynamoDBService} from "./ddb.service";
-import {CognitoCallback, CognitoUtil, LoggedInCallback} from "./cognito.service";
+import {Callback, CognitoCallback, CognitoUtil, LoggedInCallback} from "./cognito.service";
 import {AuthenticationDetails, CognitoUser, CognitoUserSession} from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk/global";
 import * as STS from "aws-sdk/clients/sts";
@@ -96,7 +96,7 @@ export class UserLoginService {
 		});
 	}
 
-	logout() {
+	signout(callback: Callback) {
 		let cognitoUser = this.cognitoUtil.getCurrentUser()
 		if (cognitoUser != null) {
 			this.cognitoUtil.getCurrentUser().signOut();
@@ -106,6 +106,7 @@ export class UserLoginService {
 			if (response.status == 'connected' || response.status == 'not_authorized') {
 				FB.logout((response) => {
 					console.log('UserLoginService: logged out from facebook');
+					callback.callbackWithParam(response);
 				});
 			}
 		});

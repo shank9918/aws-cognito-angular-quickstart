@@ -36,6 +36,9 @@ import {RouterModule} from "@angular/router";
 		ForgotPasswordStep2Component,
 		AboutComponent,
 		HomeLandingComponent
+	],
+	exports: [
+		LoginComponent
 	]
 })
 export class PublicHomeModule {
